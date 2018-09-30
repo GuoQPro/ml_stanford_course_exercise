@@ -22,12 +22,14 @@ p = zeros(size(X, 1), 1);
 %
 
 
+X_temp = [ones(m, 1) X];
+a_1 = sigmoid(Theta1 * X_temp');
+a_1 = [ones(1, m); a_1];
+a_2 = sigmoid((Theta2 * a_1)');
 
-
-
-
-
-
+for index = 1:m
+    [value p(index)] = max(a_2(index, :));
+end
 
 % =========================================================================
 
