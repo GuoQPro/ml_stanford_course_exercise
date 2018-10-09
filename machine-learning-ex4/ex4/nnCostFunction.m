@@ -69,20 +69,25 @@ a2 = sigmoid(Theta1 * x_temp'); % 25x5000
 a2_temp = [ones(1, m); a2]; % add bias to hiden layer, result is 26x5000 
 a3 = sigmoid(Theta2 * a2_temp); % 10x5000
 h_theta = a3;
-y_temp = zeros(num_labels, m); % 10x5000
+y_one_hot = zeros(num_labels, m); % 10x5000
 
 for i = 1:m
-    value = y(i);
-    y_temp(value, i) = 1;
+    y_one_hot(y(i), i) = 1;
 end
 
 % note the symbol .*
 % my own understanding: for the multi-class classification problem, only the value in h_theta corresponding to 
 % the predicted class should be considered meaningful.
 
-J = sum(sum(-y_temp .* log(h_theta) - (1 - y_temp) .* log(1 - h_theta))) / m;
+J = sum(sum(-y_one_hot .* log(h_theta) - (1 - y_one_hot) .* log(1 - h_theta))) / m;
 
+% exclude the values corresponding to bias.
+Theta1_non_bias = Theta1(:,2:size(Theta1, 2));
+Theta2_non_bias = Theta2(:,2:size(Theta2, 2));
 
+regulator = (sum(sum(Theta1_non_bias.*Theta1_non_bias)) + sum(sum(Theta2_non_bias.*Theta2_non_bias))) * lambda / (2 * m);
+
+J = J + regulator;
 
 
 
