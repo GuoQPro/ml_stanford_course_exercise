@@ -64,14 +64,20 @@ Theta2_grad = zeros(size(Theta2));
 
 
 
+x_temp = [ones(m, 1) X]; % 5000x401
+a2 = sigmoid(Theta1 * x_temp'); % 25x5000
+a2_temp = [ones(1, m); a2]; % 26x5000 
+a3 = sigmoid(Theta2 * a2_temp); % 10x5000
+h = a3;
+y_temp = zeros(num_labels, m); 
 
+for i = 1:m
+    value = y(i);
+    y_temp(value, i) = 1;
+end
 
-
-
-
-
-
-
+% note the .*
+J = sum(sum(-1 * y_temp .* log(h) - (1 - y_temp) .* log(1 - h), 2)) / m;
 
 
 
