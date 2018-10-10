@@ -17,10 +17,10 @@ function [J grad] = nnCostFunction(nn_params, ...
 % Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
 % for our 2 layer neural network
 Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
-                 hidden_layer_size, (input_layer_size + 1));
+                 hidden_layer_size, (input_layer_size + 1)); % 25x401
 
 Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
-                 num_labels, (hidden_layer_size + 1));
+                 num_labels, (hidden_layer_size + 1)); % 10x26
 
 % Setup some useful variables
 m = size(X, 1);
@@ -85,14 +85,23 @@ J = sum(sum(-y_one_hot .* log(h_theta) - (1 - y_one_hot) .* log(1 - h_theta))) /
 Theta1_non_bias = Theta1(:,2:size(Theta1, 2));
 Theta2_non_bias = Theta2(:,2:size(Theta2, 2));
 
-regulator = (sum(sum(Theta1_non_bias.*Theta1_non_bias)) + sum(sum(Theta2_non_bias.*Theta2_non_bias))) * lambda / (2 * m);
+regulator = (sum(sum(Theta1_non_bias .* Theta1_non_bias)) + sum(sum(Theta2_non_bias.*Theta2_non_bias))) * lambda / (2 * m);
 
 J = J + regulator;
 
 
+delta3 = h_theta .- y_one_hot; % 10x5000
+delta2 = Theta2_non_bias' * delta3 .* sigmoidGradient(Theta1 * x_temp'); %25x5000
+
+Delta2 = delta3 * a2_temp'; % 10x26
+Delta1 = delta2 * x_temp; % 25x401
 
 
+Theta1_grad = Delta1 / m;   
+Theta2_grad = Delta2 / m;
 
+Theta1_grad = Theta1_grad + (lambda * [zeros(size(Theta1, 1), 1) Theta1(:,2:end)] / m);
+Theta2_grad = Theta2_grad + (lambda * [zeros(size(Theta2, 1), 1) Theta2(:,2:end)] / m);
 
 % -------------------------------------------------------------
 
