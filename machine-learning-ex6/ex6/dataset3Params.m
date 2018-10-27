@@ -24,9 +24,29 @@ sigma = 0.3;
 %
 
 
+parameters = [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30];
 
+lowest_error = -1; % smaller than 0 means invalid
 
+for i = 1:length(parameters)
+    for j = 1:length(parameters)
+        model = svmTrain(X, y, parameters(i), @(x1, x2) gaussianKernel(x1, x2, parameters(j)));
+        predictions = svmPredict(model, Xval);
+        error_value = mean(double(predictions ~= yval));
 
+        if lowest_error < 0 
+            lowest_error = error_value;
+            C = parameters(i);
+            sigma = parameters(j);
+        else
+            if error_value < lowest_error
+                lowest_error = error_value;
+                C = parameters(i);
+                sigma = parameters(j);
+            end
+        end
+    end
+end
 
 
 % =========================================================================
